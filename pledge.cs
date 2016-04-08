@@ -36,9 +36,16 @@ namespace OpenBSD
         {
             if (Environment.OSVersion.Platform != PlatformID.Unix)
                 return false;
+
             Utsname uname;
             Syscall.uname(out uname);
-            return uname.sysname == "OpenBSD";
+            if (uname.sysname != "OpenBSD")
+                return false;
+
+            if (Environment.OSVersion.Version < new Version(5, 9))
+                return false;
+
+            return true;
         }
 
         /// <summary>
@@ -55,9 +62,7 @@ namespace OpenBSD
         public static void Init(string promises, string[] paths)
         {
             // check for if it's not unix, not openbsd, not openbsd 5.9
-            if (Environment.OSVersion.Platform != PlatformID.Unix
-                || !IsOpenBSD()
-                || Environment.OSVersion.Version < new Version(5, 9))
+            if (!IsOpenBSD())
             {
                 throw new PlatformNotSupportedException("pledge(2) is only supported by OpenBSD 5.9 or later.");
             }
