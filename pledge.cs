@@ -25,7 +25,8 @@ namespace OpenBSD
     /// Uses OpenBSD's pledge(2) syscall to reduce process privleges.
     /// </summary>
     /// <remarks>
-    /// Consult the OpenBSD manual page: http://man.openbsd.org/OpenBSD-current/man2/pledge.2
+    /// Consult the OpenBSD manual page:
+    /// http://man.openbsd.org/OpenBSD-current/man2/pledge.2
     /// </remarks>
     public static class Pledge
     {
@@ -73,17 +74,32 @@ namespace OpenBSD
                 switch (e)
                 {
                     case Errno.E2BIG:
-                        throw new Win32Exception((int)e, "The paths array is too large.");
+                        throw new Win32Exception((int)e,
+                            "The paths array is too large.");
                     case Errno.EINVAL:
-                        throw new Win32Exception((int)e, "The promises are malformed or invalid.");
+                        // 5.9 doesn't support paths
+                        if (paths != null && Environment.OSVersion.Version.Major == 5)
+                        {
+                            throw new Win32Exception((int)e,
+                                "Path restrictions are not supported by this version of OpenBSD.");
+                        }
+                        else
+                        {
+                            throw new Win32Exception((int)e,
+                                "The promises are malformed or invalid.");
+                        }
                     case Errno.EPERM:
-                        throw new Win32Exception((int)e, "The process is trying to increase permissions.");
+                        throw new Win32Exception((int)e,
+                            "The process is trying to increase permissions.");
                     case Errno.ENAMETOOLONG:
-                        throw new Win32Exception((int)e, "A path or the promises are too long.");
+                        throw new Win32Exception((int)e,
+                            "A path or the promises are too long.");
                     case Errno.EFAULT:
-                        throw new Win32Exception((int)e, "The paths or promises point outside of memory.");
+                        throw new Win32Exception((int)e,
+                            "The paths or promises point outside of memory.");
                     default:
-                        throw new Win32Exception((int)e, "The system has thrown an unknown error.");
+                        throw new Win32Exception((int)e,
+                            "The system has thrown an unknown error.");
                 }
             }
         }
