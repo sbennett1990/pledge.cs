@@ -64,7 +64,8 @@ namespace OpenBSD
             // check for if it's not unix, not openbsd, not openbsd 5.9
             if (!IsOpenBSD())
             {
-                throw new PlatformNotSupportedException("pledge(2) is only supported by OpenBSD 5.9 or later.");
+                throw new PlatformNotSupportedException
+                    ("pledge(2) is only supported by OpenBSD 5.9 or later.");
             }
             if (pledge(promises, paths) == -1)
             {
